@@ -1,0 +1,13 @@
+{
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "http://github.com/VladaHejda/LazyDataMapper"
+		}
+	],
+	"require": {
+		"php": ">= 5.5",
+		"nette/nette": "~2",
+		"vladahejda/lazydatamapper": "@dev"
+	}
+}

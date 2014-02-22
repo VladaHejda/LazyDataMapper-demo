@@ -1,0 +1,11 @@
+/log/*
+/temp/*
+/vendor/*
+
+!.gitignore
+!.htaccess
+!web.config
+
+/app/.config.critical.neon
+
+/composer.lock
