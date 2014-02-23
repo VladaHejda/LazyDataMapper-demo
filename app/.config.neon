@@ -8,9 +8,9 @@ php:
 
 nette:
 	database:
-		#dsn: ''
-		#user: ''
-		#password: ''
+		dsn: %db.dsn%
+		user: %db.user%
+		password: %db.password%
 		options:
 			lazy: yes
 
@@ -27,3 +27,7 @@ services:
 	- App\Model\UserManager
 	- App\RouterFactory
 	router: @App\RouterFactory::createRouter
+
+	sqliteStorage:
+		class: Nette\Caching\Storages\SQLiteStorage
+		autowired: no
