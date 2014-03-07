@@ -18,8 +18,4 @@ $configurator->addConfig(__DIR__ . '/.config.critical.neon');
 
 $container = $configurator->createContainer();
 
-// LazyDataMapper
-$sqliteStorage = $container->getService('sqliteStorage');
-$lazyDataMapperAccessor = loadLazyDataMapper(new \LazyDataMapperCache($sqliteStorage));
-
 $container->getService('application')->run();

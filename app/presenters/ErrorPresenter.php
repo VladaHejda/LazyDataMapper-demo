@@ -1,15 +1,7 @@
 <?php
 
-namespace App\Presenters;
+use Nette\Diagnostics\Debugger;
 
-use Nette,
-	App\Model,
-	Nette\Diagnostics\Debugger;
-
-
-/**
- * Error presenter.
- */
 class ErrorPresenter extends BasePresenter
 {
 
@@ -36,5 +28,4 @@ class ErrorPresenter extends BasePresenter
 			$this->terminate();
 		}
 	}
-
 }

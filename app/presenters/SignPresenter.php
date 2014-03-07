@@ -1,17 +1,7 @@
 <?php
 
-namespace App\Presenters;
-
-use Nette,
-	App\Model;
-
-
-/**
- * Sign in/out presenters.
- */
 class SignPresenter extends BasePresenter
 {
-
 
 	/**
 	 * Sign-in form factory.
@@ -62,5 +52,4 @@ class SignPresenter extends BasePresenter
 		$this->flashMessage('You have been signed out.');
 		$this->redirect('in');
 	}
-
 }

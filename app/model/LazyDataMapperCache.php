@@ -1,5 +1,7 @@
 <?php
 
+namespace LDMDemo;
+
 class LazyDataMapperCache implements \LazyDataMapper\IExternalCache
 {
 

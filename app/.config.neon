@@ -17,7 +17,7 @@ nette:
 	application:
 		errorPresenter: Error
 		mapping:
-			*: App\*Module\Presenters\*Presenter
+			*: *Presenter
 
 	session:
 		expiration: 14 days
@@ -28,6 +28,19 @@ services:
 	- App\RouterFactory
 	router: @App\RouterFactory::createRouter
 
+	pdo: PDO(%db.dsn%, %db.user%, %db.password%)
+
 	sqliteStorage:
 		class: Nette\Caching\Storages\SQLiteStorage
 		autowired: no
+
+	# LazyDataMapper
+	- LDMDemo\LazyDataMapperCache(@sqliteStorage)
+	- LazyDataMapper\RequestKey
+	- LDMDemo\EntityServiceAccessor
+	# todo NetteExtension auto service registration
+	- LazyDataMapper\SuggestorCache
+	- LazyDataMapper\Accessor
+
+	# Product model
+	- Product\Facade
