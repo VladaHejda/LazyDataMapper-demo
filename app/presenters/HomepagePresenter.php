@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Presenters;
-
-use Nette,
-	App\Model;
-
-
-/**
- * Homepage presenter.
- */
 class HomepagePresenter extends BasePresenter
 {
 
-	public function renderDefault()
+	/** @var \Product\Facade */
+	protected $productFacade;
+
+
+	public function __construct(\Product\Facade $productFacade)
 	{
-		$this->template->anyVariable = 'any value';
+		$this->productFacade = $productFacade;
 	}
 
+
+	public function renderDefault()
+	{
+		$this->template->product = $this->productFacade->getById(6);
+	}
 }
