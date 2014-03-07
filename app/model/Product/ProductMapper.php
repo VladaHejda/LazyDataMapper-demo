@@ -33,9 +33,9 @@ class Mapper implements \LazyDataMapper\IMapper
 		$columns = '`' . implode('`,`', $params) . '`';
 		$statement = $this->pdo->prepare("SELECT $columns FROM product WHERE id = ?");
 		$statement->execute([$id]);
-		$params = array_intersect_key($statement->fetch(), array_flip($params));
+		$data = array_intersect_key($statement->fetch(), array_flip($params));
 		$holder = new DataHolder($suggestor);
-		$holder->setParams($params);
+		$holder->setParams($data);
 		return $holder;
 	}
 
@@ -47,6 +47,18 @@ class Mapper implements \LazyDataMapper\IMapper
 
 	public function getByIdsRange(array $ids, ISuggestor $suggestor)
 	{
+		$params = $suggestor->getParamNames();
+		$columns = '`' . implode('`,`', $params) . '`';
+		$in = implode(',', array_fill(0, count($ids), '?'));
+		$statement = $this->pdo->prepare("SELECT id, $columns FROM product WHERE id IN ($in)");
+		$statement->execute($ids);
+		$holder = new DataHolder($suggestor, $ids);
+		$params = array_flip($params);
+		while ($row = $statement->fetch()) {
+			$data = array_intersect_key($row, $params);
+			$holder->setParams([$row['id'] => $data]);
+		}
+		return $holder;
 	}
 
 
