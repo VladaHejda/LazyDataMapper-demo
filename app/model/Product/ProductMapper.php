@@ -64,6 +64,10 @@ class Mapper implements \LazyDataMapper\IMapper
 
 	public function save($id, IDataHolder $holder)
 	{
+		$changes = $holder->getParams();
+		$columns = '`' . implode('` = ?,`', array_keys($changes)) . '` = ?';
+		$statement = $this->pdo->prepare("UPDATE product SET $columns WHERE id = ?");
+		$statement->execute(array_merge(array_values($changes), [$id]));
 	}
 
 

@@ -52,19 +52,19 @@ INSERT INTO `department` (`id`, `name`) VALUES
 	(3, 'phone');
 
 INSERT INTO `product` (`id`, `department_id`, `name`, `price`, `stock`) VALUES
-	(1, 1, 'LGY smart-1 TV', 4200, 3),
-	(2, 1, 'LGY smart-1.1 devil edition TV', 6666, 1),
-	(3, 1, 'Panavocal COMPACT', 3000, 25),
-	(4, 2, 'Panavocal HiCAM 7', 2400, 12),
-	(5, 2, 'Panavocal HiCAM 8', 3180, 4),
-	(6, 2, 'Panavocal HiCAM 8 improved', 3550, 4),
-	(7, 2, 'Panavocal HiCAM 9', 5940, 4),
-	(8, 2, 'Nixon G1', 5690, 10),
-	(9, 2, 'Nixon G2', 6900, 5),
-	(10, 2, 'Nixon E1', 5710, 0),
-	(11, 3, 'Nocia M300', 1900, 30),
-	(12, 3, 'Nocia M5000', 6999, 54),
-	(13, 3, 'Sory Electroson pg90', 5320, 12);
+	(1, 1, 'LGY smart-1 TV', 155, 3),
+	(2, 1, 'LGY smart-1.1 devil edition TV', 266, 1),
+	(3, 1, 'Panavocal COMPACT', 110, 25),
+	(4, 2, 'Panavocal HiCAM 7', 89, 12),
+	(5, 2, 'Panavocal HiCAM 8', 118.5, 4),
+	(6, 2, 'Panavocal HiCAM 8 improved', 131, 4),
+	(7, 2, 'Panavocal HiCAM 9', 220, 4),
+	(8, 2, 'Nixon G1', 210, 10),
+	(9, 2, 'Nixon G2', 255, 5),
+	(10, 2, 'Nixon E1', 209.9, 0),
+	(11, 3, 'Nocia M300', 70, 30),
+	(12, 3, 'Nocia M5000', 259.99, 54),
+	(13, 3, 'Sory Electroson pg90', 197, 12);
 
 INSERT INTO `product_parameter_list` (`id`, `department_id`, `parameter_name`) VALUES
 	(1, 1, 'diagonal'),

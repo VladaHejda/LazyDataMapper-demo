@@ -3,7 +3,7 @@
 <h1>LazyDataMapperDemo</h1>
 
 <p>
-	Product name: {$product->name} (price: {$product->price} Kč)
+	Product name: {$product->name} (price: {$product->price} €)
 </p>
 
 <table>
@@ -14,7 +14,10 @@
 	</thead>
 	<tbody>
 		<tr n:foreach="$products as $i => $product">
-			<td>{$i+1}.</td><td>{$product->name}</td><td>{$product->price} Kč</td>
+			<td>{$i+1}.</td><td>{$product->name}</td><td>{$product->price} €</td>
 		</tr>
 	</tbody>
 </table>
+
+<h2>Product 13</h2>
+{control modifyProduct13}
