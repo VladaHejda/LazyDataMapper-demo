@@ -73,4 +73,27 @@ class HomepagePresenter extends BasePresenter
 			$this->flashMessage('Product 13 successfully saved!');
 		}
 	}
+
+
+	public function createComponentCreateTV()
+	{
+		$form = new Form;
+		$form->addText('name', 'Name:')
+			->setRequired();
+		$form->addText('price', 'Price:')
+			->setRequired()
+			->addRule(Form::RANGE, [0, NULL]);
+		$form->addSubmit('create', 'Create');
+		$form->onSuccess[] = $this->createTV;
+		return $form;
+	}
+
+
+	public function createTV(Form $form)
+	{
+		$values = $form->getValues();
+
+		$this->productFacade->create($values->name, $values->price, 1);
+		$this->flashMessage("TV $values->name created!");
+	}
 }

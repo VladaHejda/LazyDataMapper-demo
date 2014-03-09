@@ -23,7 +23,7 @@ class Product extends \LazyDataMapper\Entity
 	{
 		$name = (string) $name;
 		if (empty($name)) {
-			throw new IntegrityException("Name cannot be empty!");
+			throw new IntegrityException('Name cannot be empty!');
 		}
 		return $name;
 	}
@@ -32,11 +32,11 @@ class Product extends \LazyDataMapper\Entity
 	protected function setPrice($price)
 	{
 		if (!is_numeric($price)) {
-			throw new IntegrityException("Price must be a number!");
+			throw new IntegrityException('Price must be a number!');
 		}
 		$price = (float) $price;
 		if ($price < 0) {
-			throw new IntegrityException("Price cannot be negative!");
+			throw new IntegrityException('Price cannot be negative!');
 		}
 		return $price;
 	}
@@ -45,11 +45,11 @@ class Product extends \LazyDataMapper\Entity
 	protected function setStockCount($count)
 	{
 		if (!is_numeric($count)) {
-			throw new IntegrityException("Stock count must be a number!");
+			throw new IntegrityException('Stock count must be a number!');
 		}
 		$count = (int) $count;
 		if ($count < 0) {
-			throw new IntegrityException("Stock count cannot be negative!");
+			throw new IntegrityException('Stock count cannot be negative!');
 		}
 		$this->setReadOnlyOrPrivate('stock', $count);
 	}

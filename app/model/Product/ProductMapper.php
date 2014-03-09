@@ -73,6 +73,12 @@ class Mapper implements \LazyDataMapper\IMapper
 
 	public function create(IDataHolder $holder)
 	{
+		$data = $holder->getParams();
+		$columns = '`' . implode('`,`', array_keys($data)) . '`';
+		$values = implode(',', array_fill(0, count($data), '?'));
+		$statement = $this->pdo->prepare("INSERT INTO product ($columns) VALUES($values)");
+		$statement->execute(array_values($data));
+		return (int) $this->pdo->query("SELECT LAST_INSERT_ID()")->fetchColumn();
 	}
 
 
