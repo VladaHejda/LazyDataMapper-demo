@@ -24,3 +24,8 @@
 
 <h2>Create new TV</h2>
 {control createTV}
+
+<h2>TVs most expensive for 250 €:</h2>
+<ul n:if="count($tvs)" n:inner-foreach="$tvs as $tv">
+	<li>{$tv->name} (price {$tv->price})</li>
+</ul>

@@ -24,6 +24,11 @@ class HomepagePresenter extends BasePresenter
 		$this->template->product = $this->productFacade->getById(6);
 
 		$this->template->products = $this->productFacade->getByIdsRange([7, 10, 11]);
+
+		$tvsRestrictor = new \Product\Restrictor;
+		$tvsRestrictor->limitDepartment(1);
+		$tvsRestrictor->limitPrice(NULL, 250);
+		$this->template->tvs = $this->productFacade->getByRestrictions($tvsRestrictor);
 	}
 
 

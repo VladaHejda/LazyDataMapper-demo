@@ -42,6 +42,14 @@ class Mapper implements \LazyDataMapper\IMapper
 
 	public function getIdsByRestrictions(\LazyDataMapper\IRestrictor $restrictor)
 	{
+		list($conditions, $parameters) = $restrictor->getRestrictions();
+		$statement = $this->pdo->prepare("SELECT id FROM product WHERE $conditions");
+		$statement->execute($parameters);
+		$ids = [];
+		while ($id = $statement->fetchColumn()) {
+			$ids[] = $id;
+		}
+		return $ids;
 	}
 
 
