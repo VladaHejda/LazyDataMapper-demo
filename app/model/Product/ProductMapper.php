@@ -92,5 +92,12 @@ class Mapper implements \LazyDataMapper\IMapper
 
 	public function remove($id)
 	{
+		$statement = $this->pdo->prepare('DELETE FROM product WHERE id = ? LIMIT 1');
+		$statement->execute([$id]);
+	}
+
+
+	public function removeByIdsRange(array $ids)
+	{
 	}
 }

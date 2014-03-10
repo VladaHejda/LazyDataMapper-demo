@@ -75,7 +75,7 @@ class HomepagePresenter extends BasePresenter
 			$this->product13->reset();
 		} else {
 			$this->product13->save();
-			$this->flashMessage('Product 13 successfully saved!');
+			$this->flashMessage('Product 13 successfully saved!', 'done');
 		}
 	}
 
@@ -87,7 +87,8 @@ class HomepagePresenter extends BasePresenter
 			->setRequired();
 		$form->addText('price', 'Price:')
 			->setRequired()
-			->addRule(Form::RANGE, [0, NULL]);
+			->addRule(Form::FLOAT, 'Price must be a number!')
+			->addRule(Form::RANGE, 'Price must be non negative number!', [0, NULL]);
 		$form->addSubmit('create', 'Create');
 		$form->onSuccess[] = $this->createTV;
 		return $form;
@@ -99,6 +100,27 @@ class HomepagePresenter extends BasePresenter
 		$values = $form->getValues();
 
 		$this->productFacade->create($values->name, $values->price, 1);
-		$this->flashMessage("TV $values->name created!");
+		$this->flashMessage("TV $values->name created!", 'done');
+		$this->redirect('this');
+	}
+
+
+	public function createComponentRemoveTV()
+	{
+		$form = new Form;
+		$form->addSubmit('remove', 'REMOVE SELECTED');
+		$form->onSuccess[] = $this->removeTV;
+		return $form;
+	}
+
+
+	public function removeTV(Form $form)
+	{
+		$ids = $form->getHttpData($form::DATA_TEXT, 'rm[]');
+		foreach ($ids as $id) {
+			$name = $this->productFacade->getById($id)->name;
+			$this->flashMessage("TV $name removed.", 'done');
+			$this->productFacade->remove($id);
+		}
 	}
 }
