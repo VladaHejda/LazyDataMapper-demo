@@ -99,5 +99,9 @@ class Mapper implements \LazyDataMapper\IMapper
 
 	public function removeByIdsRange(array $ids)
 	{
+		$count = count($ids);
+		$in = implode(',', array_fill(0, $count, '?'));
+		$statement = $this->pdo->prepare("DELETE FROM product WHERE id IN ($in) LIMIT $count");
+		$statement->execute($ids);
 	}
 }
