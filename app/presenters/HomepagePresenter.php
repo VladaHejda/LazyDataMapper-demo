@@ -96,7 +96,7 @@ class HomepagePresenter extends BasePresenter
 		$values = $form->getValues();
 
 		try {
-			$this->productFacade->create($values->name, $values->price, 1);
+			$this->productFacade->create($values->name, $values->price, 1, FALSE);
 		} catch (IntegrityException $e) {
 			foreach ($e->getAllMessages() as $param => $message) {
 				$form[$param]->addError($message);

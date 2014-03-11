@@ -15,7 +15,7 @@ class Product extends \LazyDataMapper\Entity
 
 	protected function getStockCount()
 	{
-		return $this->getClear('stock');
+		return $this->getBase('stock');
 	}
 
 

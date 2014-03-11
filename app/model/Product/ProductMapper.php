@@ -27,14 +27,13 @@ class Mapper implements \LazyDataMapper\IMapper
 	}
 
 
-	public function getById($id, ISuggestor $suggestor)
+	public function getById($id, ISuggestor $suggestor, IDataHolder $holder = NULL)
 	{
 		$params = $suggestor->getParamNames();
 		$columns = '`' . implode('`,`', $params) . '`';
 		$statement = $this->pdo->prepare("SELECT $columns FROM product WHERE id = ?");
 		$statement->execute([$id]);
 		$data = array_intersect_key($statement->fetch(), array_flip($params));
-		$holder = new DataHolder($suggestor);
 		$holder->setParams($data);
 		return $holder;
 	}
@@ -53,14 +52,13 @@ class Mapper implements \LazyDataMapper\IMapper
 	}
 
 
-	public function getByIdsRange(array $ids, ISuggestor $suggestor)
+	public function getByIdsRange(array $ids, ISuggestor $suggestor, IDataHolder $holder = NULL)
 	{
 		$params = $suggestor->getParamNames();
 		$columns = '`' . implode('`,`', $params) . '`';
 		$in = implode(',', array_fill(0, count($ids), '?'));
 		$statement = $this->pdo->prepare("SELECT id, $columns FROM product WHERE id IN ($in)");
 		$statement->execute($ids);
-		$holder = new DataHolder($suggestor, $ids);
 		$params = array_flip($params);
 		while ($row = $statement->fetch()) {
 			$data = array_intersect_key($row, $params);
