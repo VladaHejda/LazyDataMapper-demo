@@ -14,11 +14,14 @@ class Facade extends \LazyDataMapper\Facade
 	 */
 	public function create($name, $price, $department, $throwFirst = TRUE)
 	{
-		$data = [
+		$publicData = [
 			'name' => $name,
 			'price' => $price,
+		];
+
+		$privateData = [
 			'department_id' => $department,
 		];
-		return $this->createEntity($data, $throwFirst);
+		return $this->createEntity($publicData, $privateData, $throwFirst);
 	}
 }

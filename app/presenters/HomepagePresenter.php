@@ -83,12 +83,8 @@ class HomepagePresenter extends BasePresenter
 	public function createComponentCreateTV()
 	{
 		$form = new Form;
-		$form->addText('name', 'Name:')
-			->setRequired();
-		$form->addText('price', 'Price:')
-			->setRequired()
-			->addRule(Form::FLOAT, 'Price must be a number!')
-			->addRule(Form::RANGE, 'Price must be non negative number!', [0, NULL]);
+		$form->addText('name', 'Name:');
+		$form->addText('price', 'Price:');
 		$form->addSubmit('create', 'Create');
 		$form->onSuccess[] = $this->createTV;
 		return $form;
@@ -99,7 +95,14 @@ class HomepagePresenter extends BasePresenter
 	{
 		$values = $form->getValues();
 
-		$this->productFacade->create($values->name, $values->price, 1);
+		try {
+			$this->productFacade->create($values->name, $values->price, 1);
+		} catch (IntegrityException $e) {
+			foreach ($e->getAllMessages() as $param => $message) {
+				$form[$param]->addError($message);
+			}
+			return;
+		}
 		$this->flashMessage("TV $values->name created!", 'done');
 		$this->redirect('this');
 	}
