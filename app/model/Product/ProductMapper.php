@@ -4,7 +4,7 @@ namespace Product;
 
 use LazyDataMapper\ISuggestor,
 	LazyDataMapper\IDataHolder,
-	LazyDataMapper\DataHolder;
+	\LazyDataMapper\SuggestorHelpers;
 
 class Mapper implements \LazyDataMapper\IMapper
 {
@@ -30,7 +30,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function getById($id, ISuggestor $suggestor, IDataHolder $holder = NULL)
 	{
 		$params = $suggestor->getParamNames();
-		$columns = '`' . implode('`,`', $params) . '`';
+		$columns = SuggestorHelpers::wrapColumns($params);
 		$statement = $this->pdo->prepare("SELECT $columns FROM product WHERE id = ?");
 		$statement->execute([$id]);
 		$data = array_intersect_key($statement->fetch(), array_flip($params));
@@ -39,7 +39,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	}
 
 
-	public function getIdsByRestrictions(\LazyDataMapper\IRestrictor $restrictor)
+	public function getIdsByRestrictions(\LazyDataMapper\IRestrictor $restrictor, $limit = NULL)
 	{
 		list($conditions, $parameters) = $restrictor->getRestrictions();
 		$statement = $this->pdo->prepare("SELECT id FROM product WHERE $conditions");
@@ -55,7 +55,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function getByIdsRange(array $ids, ISuggestor $suggestor, IDataHolder $holder = NULL)
 	{
 		$params = $suggestor->getParamNames();
-		$columns = '`' . implode('`,`', $params) . '`';
+		$columns = SuggestorHelpers::wrapColumns($params);
 		$in = implode(',', array_fill(0, count($ids), '?'));
 		$statement = $this->pdo->prepare("SELECT id, $columns FROM product WHERE id IN ($in)");
 		$statement->execute($ids);
@@ -71,7 +71,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function save($id, IDataHolder $holder)
 	{
 		$changes = $holder->getParams();
-		$columns = '`' . implode('` = ?,`', array_keys($changes)) . '` = ?';
+		$columns = SuggestorHelpers::wrapColumns(array_keys($changes), '= ?');
 		$statement = $this->pdo->prepare("UPDATE product SET $columns WHERE id = ?");
 		$statement->execute(array_merge(array_values($changes), [$id]));
 	}
@@ -80,7 +80,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function create(IDataHolder $holder)
 	{
 		$data = $holder->getParams();
-		$columns = '`' . implode('`,`', array_keys($data)) . '`';
+		$columns = SuggestorHelpers::wrapColumns(array_keys($data));
 		$values = implode(',', array_fill(0, count($data), '?'));
 		$statement = $this->pdo->prepare("INSERT INTO product ($columns) VALUES($values)");
 		$statement->execute(array_values($data));
