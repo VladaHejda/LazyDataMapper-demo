@@ -51,6 +51,6 @@ class Product extends \LazyDataMapper\Entity
 		if ($count < 0) {
 			throw new IntegrityException('Stock count cannot be negative!');
 		}
-		$this->setReadOnlyOrPrivate('stock', $count);
+		$this->setImmutable('stock', $count);
 	}
 }

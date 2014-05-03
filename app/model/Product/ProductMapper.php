@@ -2,8 +2,8 @@
 
 namespace Product;
 
-use LazyDataMapper\ISuggestor,
-	LazyDataMapper\IDataHolder,
+use LazyDataMapper\Suggestor,
+	LazyDataMapper\DataHolder,
 	\LazyDataMapper\SuggestorHelpers;
 
 class Mapper implements \LazyDataMapper\IMapper
@@ -27,14 +27,14 @@ class Mapper implements \LazyDataMapper\IMapper
 	}
 
 
-	public function getById($id, ISuggestor $suggestor, IDataHolder $holder = NULL)
+	public function getById($id, Suggestor $suggestor, DataHolder $holder = NULL)
 	{
-		$params = $suggestor->getParamNames();
+		$params = $suggestor->getSuggestions();
 		$columns = SuggestorHelpers::wrapColumns($params);
 		$statement = $this->pdo->prepare("SELECT $columns FROM product WHERE id = ?");
 		$statement->execute([$id]);
 		$data = array_intersect_key($statement->fetch(), array_flip($params));
-		$holder->setParams($data);
+		$holder->setData($data);
 		return $holder;
 	}
 
@@ -52,9 +52,9 @@ class Mapper implements \LazyDataMapper\IMapper
 	}
 
 
-	public function getByIdsRange(array $ids, ISuggestor $suggestor, IDataHolder $holder = NULL)
+	public function getByIdsRange(array $ids, Suggestor $suggestor, DataHolder $holder = NULL)
 	{
-		$params = $suggestor->getParamNames();
+		$params = $suggestor->getSuggestions();
 		$columns = SuggestorHelpers::wrapColumns($params);
 		$in = implode(',', array_fill(0, count($ids), '?'));
 		$statement = $this->pdo->prepare("SELECT id, $columns FROM product WHERE id IN ($in)");
@@ -62,24 +62,24 @@ class Mapper implements \LazyDataMapper\IMapper
 		$params = array_flip($params);
 		while ($row = $statement->fetch()) {
 			$data = array_intersect_key($row, $params);
-			$holder->setParams([$row['id'] => $data]);
+			$holder->setData([$row['id'] => $data]);
 		}
 		return $holder;
 	}
 
 
-	public function save($id, IDataHolder $holder)
+	public function save($id, DataHolder $holder)
 	{
-		$changes = $holder->getParams();
+		$changes = $holder->getData();
 		$columns = SuggestorHelpers::wrapColumns(array_keys($changes), '= ?');
 		$statement = $this->pdo->prepare("UPDATE product SET $columns WHERE id = ?");
 		$statement->execute(array_merge(array_values($changes), [$id]));
 	}
 
 
-	public function create(IDataHolder $holder)
+	public function create(DataHolder $holder)
 	{
-		$data = $holder->getParams();
+		$data = $holder->getData();
 		$columns = SuggestorHelpers::wrapColumns(array_keys($data));
 		$values = implode(',', array_fill(0, count($data), '?'));
 		$statement = $this->pdo->prepare("INSERT INTO product ($columns) VALUES($values)");

@@ -1,5 +1,5 @@
 <?php
 
-class Products extends \LazyDataMapper\EntityContainer
+class Products extends \LazyDataMapper\EntityCollection
 {
 }
