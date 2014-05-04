@@ -2,9 +2,8 @@
 
 namespace Department;
 
-use LazyDataMapper\Suggestor,
-	LazyDataMapper\DataHolder,
-	\LazyDataMapper\SuggestorHelpers;
+use LazyDataMapper\Suggestor;
+use LazyDataMapper\DataHolder;
 
 class Mapper implements \LazyDataMapper\IMapper
 {
@@ -28,7 +27,12 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function getById($id, Suggestor $suggestor, DataHolder $holder = NULL)
 	{
 		$params = $suggestor->getSuggestions();
-		$columns = SuggestorHelpers::wrapColumns($params);
+		$columns = implode(',', $params);
+
+		if ($suggestor->products) {
+
+		}
+
 		$data = $this->db->fetch("SELECT $columns FROM department WHERE id = ?", $id);
 		$holder->setData(iterator_to_array($data));
 		return $holder;
@@ -43,7 +47,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function getByIdsRange(array $ids, Suggestor $suggestor, DataHolder $holder = NULL)
 	{
 		$params = $suggestor->getSuggestions();
-		$columns = SuggestorHelpers::wrapColumns($params);
+		$columns = implode(',', $params);
 		$in = implode(',', array_fill(0, count($ids), '?'));
 
 		$result = $this->db->queryArgs("SELECT id, $columns FROM department WHERE id IN ($in)", $ids)->fetchAll();

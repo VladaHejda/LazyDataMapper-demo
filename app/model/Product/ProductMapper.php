@@ -2,9 +2,8 @@
 
 namespace Product;
 
-use LazyDataMapper\Suggestor,
-	LazyDataMapper\DataHolder,
-	\LazyDataMapper\SuggestorHelpers;
+use LazyDataMapper\Suggestor;
+use LazyDataMapper\DataHolder;
 
 class Mapper implements \LazyDataMapper\IMapper
 {
@@ -28,7 +27,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function getById($id, Suggestor $suggestor, DataHolder $holder = NULL)
 	{
 		$params = $suggestor->getSuggestions();
-		$columns = SuggestorHelpers::wrapColumns($params);
+		$columns = implode(',', $params);
 		$data = $this->db->fetch("SELECT $columns FROM product WHERE id = ?", $id);
 		$holder->setData(iterator_to_array($data));
 		return $holder;
@@ -49,7 +48,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function getByIdsRange(array $ids, Suggestor $suggestor, DataHolder $holder = NULL)
 	{
 		$params = $suggestor->getSuggestions();
-		$columns = SuggestorHelpers::wrapColumns($params);
+		$columns = implode(',', $params);
 		$in = implode(',', array_fill(0, count($ids), '?'));
 		$result = $this->db->queryArgs("SELECT id, $columns FROM product WHERE id IN ($in)", $ids)->fetchAll();
 		$data = [];
@@ -68,7 +67,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function save($id, DataHolder $holder)
 	{
 		$changes = $holder->getData();
-		$columns = SuggestorHelpers::wrapColumns(array_keys($changes), '= ?');
+		$columns = implode('=?, ', array_keys($changes)) . '=?';
 		$this->db->queryArgs("UPDATE product SET $columns WHERE id = ?", array_merge($changes, [$id]));
 	}
 
@@ -76,7 +75,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function create(DataHolder $holder)
 	{
 		$data = $holder->getData();
-		$columns = SuggestorHelpers::wrapColumns(array_keys($data));
+		$columns = implode(',', array_keys($data));
 		$values = implode(',', array_fill(0, count($data), '?'));
 		$this->db->queryArgs("INSERT INTO product ($columns) VALUES($values)", $data);
 		return (int) $this->db->getInsertId();
