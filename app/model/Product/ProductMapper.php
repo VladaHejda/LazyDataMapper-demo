@@ -9,22 +9,19 @@ use LazyDataMapper\Suggestor,
 class Mapper implements \LazyDataMapper\IMapper
 {
 
-	/** @var \PDO */
-	private $pdo;
+	/** @var \Nette\Database\Connection */
+	private $db;
 
 
-	// todo modify to Nette\Database
-	public function __construct(\PDO $pdo)
+	public function __construct(\Nette\Database\Connection $db)
 	{
-		$this->pdo = $pdo;
+		$this->db = $db;
 	}
 
 
 	public function exists($id)
 	{
-		$statement = $this->pdo->prepare('SELECT 1 FROM product WHERE id = ?');
-		$statement->execute([$id]);
-		return (bool) $statement->fetchColumn();
+		return (bool) $this->db->fetchField('SELECT 1 FROM product WHERE id = ?', $id);
 	}
 
 
@@ -32,9 +29,8 @@ class Mapper implements \LazyDataMapper\IMapper
 	{
 		$params = $suggestor->getSuggestions();
 		$columns = SuggestorHelpers::wrapColumns($params);
-		$statement = $this->pdo->prepare("SELECT $columns FROM product WHERE id = ?");
-		$statement->execute([$id]);
-		$holder->setData($statement->fetch());
+		$data = $this->db->fetch("SELECT $columns FROM product WHERE id = ?", $id);
+		$holder->setData(iterator_to_array($data));
 		return $holder;
 	}
 
@@ -42,11 +38,9 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function getIdsByRestrictions(\LazyDataMapper\IRestrictor $restrictor, $limit = NULL)
 	{
 		list($conditions, $parameters) = $restrictor->getRestrictions();
-		$statement = $this->pdo->prepare("SELECT id FROM product p WHERE $conditions");
-		$statement->execute($parameters);
-		$ids = [];
-		while ($id = $statement->fetchColumn()) {
-			$ids[] = $id;
+		$ids = $this->db->queryArgs("SELECT id FROM product p WHERE $conditions", $parameters)->fetchAll();
+		foreach ($ids as &$id) {
+			$id = $id->id;
 		}
 		return $ids;
 	}
@@ -57,12 +51,12 @@ class Mapper implements \LazyDataMapper\IMapper
 		$params = $suggestor->getSuggestions();
 		$columns = SuggestorHelpers::wrapColumns($params);
 		$in = implode(',', array_fill(0, count($ids), '?'));
-		$statement = $this->pdo->prepare("SELECT id, $columns FROM product WHERE id IN ($in)");
-		$statement->execute($ids);
-		while ($row = $statement->fetch()) {
-			$holder->setData([$row['id'] => $row]);
+		$result = $this->db->queryArgs("SELECT id, $columns FROM product WHERE id IN ($in)", $ids)->fetchAll();
+		$data = [];
+		foreach ($result as &$subdata) {
+			$data[$subdata->id] = (array) $subdata;
 		}
-		return $holder;
+		return $holder->setData($data);
 	}
 
 
@@ -75,8 +69,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	{
 		$changes = $holder->getData();
 		$columns = SuggestorHelpers::wrapColumns(array_keys($changes), '= ?');
-		$statement = $this->pdo->prepare("UPDATE product SET $columns WHERE id = ?");
-		$statement->execute(array_merge(array_values($changes), [$id]));
+		$this->db->queryArgs("UPDATE product SET $columns WHERE id = ?", array_merge($changes, [$id]));
 	}
 
 
@@ -85,16 +78,14 @@ class Mapper implements \LazyDataMapper\IMapper
 		$data = $holder->getData();
 		$columns = SuggestorHelpers::wrapColumns(array_keys($data));
 		$values = implode(',', array_fill(0, count($data), '?'));
-		$statement = $this->pdo->prepare("INSERT INTO product ($columns) VALUES($values)");
-		$statement->execute(array_values($data));
-		return (int) $this->pdo->query("SELECT LAST_INSERT_ID()")->fetchColumn();
+		$this->db->queryArgs("INSERT INTO product ($columns) VALUES($values)", $data);
+		return (int) $this->db->getInsertId();
 	}
 
 
 	public function remove($id)
 	{
-		$statement = $this->pdo->prepare('DELETE FROM product WHERE id = ? LIMIT 1');
-		$statement->execute([$id]);
+		$this->db->query('DELETE FROM product WHERE id = ? LIMIT 1', $id);
 	}
 
 
@@ -102,7 +93,6 @@ class Mapper implements \LazyDataMapper\IMapper
 	{
 		$count = count($ids);
 		$in = implode(',', array_fill(0, $count, '?'));
-		$statement = $this->pdo->prepare("DELETE FROM product WHERE id IN ($in) LIMIT $count");
-		$statement->execute($ids);
+		$this->db->queryArgs("DELETE FROM product WHERE id IN ($in) LIMIT $count", $ids);
 	}
 }

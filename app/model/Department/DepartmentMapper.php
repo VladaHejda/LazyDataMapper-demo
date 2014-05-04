@@ -9,21 +9,19 @@ use LazyDataMapper\Suggestor,
 class Mapper implements \LazyDataMapper\IMapper
 {
 
-	/** @var \PDO */
-	private $pdo;
+	/** @var \Nette\Database\Connection */
+	private $db;
 
 
-	public function __construct(\PDO $pdo)
+	public function __construct(\Nette\Database\Connection $db)
 	{
-		$this->pdo = $pdo;
+		$this->db = $db;
 	}
 
 
 	public function exists($id)
 	{
-		$statement = $this->pdo->prepare('SELECT 1 FROM department WHERE id = ?');
-		$statement->execute([$id]);
-		return (bool) $statement->fetchColumn();
+		return (bool) $this->db->fetchField('SELECT 1 FROM department WHERE id = ?', $id);
 	}
 
 
@@ -31,9 +29,8 @@ class Mapper implements \LazyDataMapper\IMapper
 	{
 		$params = $suggestor->getSuggestions();
 		$columns = SuggestorHelpers::wrapColumns($params);
-		$statement = $this->pdo->prepare("SELECT $columns FROM department WHERE id = ?");
-		$statement->execute([$id]);
-		$holder->setData($statement->fetch());
+		$data = $this->db->fetch("SELECT $columns FROM department WHERE id = ?", $id);
+		$holder->setData(iterator_to_array($data));
 		return $holder;
 	}
 
@@ -48,23 +45,22 @@ class Mapper implements \LazyDataMapper\IMapper
 		$params = $suggestor->getSuggestions();
 		$columns = SuggestorHelpers::wrapColumns($params);
 		$in = implode(',', array_fill(0, count($ids), '?'));
-		$statement = $this->pdo->prepare("SELECT id, $columns FROM department WHERE id IN ($in)");
-		$statement->execute($ids);
-		$holder->setIdSource('id');
-		while ($row = $statement->fetch()) {
-			// todo set it as $holder->setData($row);
-			$holder->setData([$row]);
+
+		$result = $this->db->queryArgs("SELECT id, $columns FROM department WHERE id IN ($in)", $ids)->fetchAll();
+		$data = [];
+		foreach ($result as &$subdata) {
+			$data[$subdata->id] = (array) $subdata;
 		}
+		$holder->setData($data);
 		return $holder;
 	}
 
 
 	public function getAllIds($limit = NULL)
 	{
-		$statement = $this->pdo->query("SELECT id FROM department" . ($limit ? " LIMIT $limit" : ''));
-		$ids = [];
-		foreach ($statement->fetchAll() as $row) {
-			$ids[] = $row['id'];
+		$ids = $this->db->fetchAll("SELECT id FROM department" . ($limit ? " LIMIT $limit" : ''));
+		foreach ($ids as &$id) {
+			$id = $id->id;
 		}
 		return $ids;
 	}

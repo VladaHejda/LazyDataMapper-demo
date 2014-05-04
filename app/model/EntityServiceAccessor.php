@@ -5,13 +5,13 @@ namespace LDMDemo;
 class EntityServiceAccessor extends \LazyDataMapper\EntityServiceAccessor
 {
 
-	/** @var \PDO */
-	protected $pdo;
+	/** @var \Nette\Database\Connection */
+	protected $db;
 
 
-	public function __construct(\PDO $pdo)
+	public function __construct(\Nette\Database\Connection $db)
 	{
-		$this->pdo = $pdo;
+		$this->db = $db;
 	}
 
 
@@ -41,6 +41,6 @@ class EntityServiceAccessor extends \LazyDataMapper\EntityServiceAccessor
 
 	protected function createMapper($mapper)
 	{
-		return new $mapper($this->pdo);
+		return new $mapper($this->db);
 	}
 }
