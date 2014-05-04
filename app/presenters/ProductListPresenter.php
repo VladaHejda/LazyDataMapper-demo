@@ -29,11 +29,11 @@ class ProductListPresenter extends BasePresenter
 		$this->template->departments = $this->departmentFacade->getAll();
 
 		if ($departmentId !== NULL) {
-			$department = $this->departmentFacade->getById($departmentId);
-			if (!$department) {
+			$this->department = $this->departmentFacade->getById($departmentId);
+			if (!$this->department) {
 				throw new BadRequestException("Unknown department ID $departmentId.");
 			}
-			$this->template->currentDepartment = $this->department = $department;
+			$this->template->currentDepartment = $this->department;
 		}
 
 		$this['searchProduct']->action = '?';
@@ -42,11 +42,11 @@ class ProductListPresenter extends BasePresenter
 
 	public function actionNew($departmentId)
 	{
-		$department = $this->departmentFacade->getById($departmentId);
-		if (!$department) {
+		$this->department = $this->departmentFacade->getById($departmentId);
+		if (!$this->department) {
 			throw new BadRequestException("Unknown department ID $departmentId.");
 		}
-		$this->template->department = $this->department = $department;
+		$this->template->department = $this->department;
 	}
 
 
@@ -101,7 +101,7 @@ class ProductListPresenter extends BasePresenter
 		$form->addText('name', 'Product name:')
 			->setRequired('Please fill the name.');
 
-		$form->addText('price', 'Price:')
+		$form->addText('price', 'Price €:')
 			->setRequired('Please fill the price.')
 			->addRule(Form::RANGE, 'Fill price as positive number.', [0, NULL]);
 

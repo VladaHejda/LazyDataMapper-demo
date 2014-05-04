@@ -6,6 +6,7 @@ use LazyDataMapper\IntegrityException;
  * @property string $name
  * @property float $price
  * @property int $stockCount
+ * @property-read Department $department
  */
 class Product extends \LazyDataMapper\Entity
 {
@@ -16,6 +17,12 @@ class Product extends \LazyDataMapper\Entity
 	protected function getStockCount()
 	{
 		return $this->getBase('stock');
+	}
+
+
+	protected function getDepartment()
+	{
+		return $this->getChild('Department', $this->getBase('department_id'));
 	}
 
 

@@ -68,7 +68,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	{
 		$changes = $holder->getData();
 		$columns = implode(' = ?, ', array_keys($changes)) . ' = ?';
-		$this->db->queryArgs("UPDATE product SET $columns WHERE id = ?", array_merge($changes, [$id]));
+		$this->db->queryArgs("UPDATE product SET $columns WHERE id = ?", array_merge(array_values($changes), [$id]));
 	}
 
 
