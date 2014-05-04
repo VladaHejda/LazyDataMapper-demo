@@ -1,6 +1,8 @@
 <?php
 
 use Nette\Application\UI\Form;
+use Nette\Application\BadRequestException;
+use LazyDataMapper\IntegrityException;
 
 class ProductListPresenter extends BasePresenter
 {
@@ -10,6 +12,9 @@ class ProductListPresenter extends BasePresenter
 
 	/** @var \Product\Facade */
 	protected $productFacade;
+
+	/** @var Department */
+	protected $department;
 
 
 	public function __construct(\Department\Facade $departmentFacade, \Product\Facade $productFacade)
@@ -24,10 +29,24 @@ class ProductListPresenter extends BasePresenter
 		$this->template->departments = $this->departmentFacade->getAll();
 
 		if ($departmentId !== NULL) {
-			$this->template->currentDepartment = $this->departmentFacade->getById($departmentId);
+			$department = $this->departmentFacade->getById($departmentId);
+			if (!$department) {
+				throw new BadRequestException("Unknown department ID $departmentId.");
+			}
+			$this->template->currentDepartment = $this->department = $department;
 		}
 
 		$this['searchProduct']->action = '?';
+	}
+
+
+	public function actionNew($departmentId)
+	{
+		$department = $this->departmentFacade->getById($departmentId);
+		if (!$department) {
+			throw new BadRequestException("Unknown department ID $departmentId.");
+		}
+		$this->template->department = $this->department = $department;
 	}
 
 
@@ -39,11 +58,11 @@ class ProductListPresenter extends BasePresenter
 
 		$form->addText('priceFrom', 'Price min:')
 			->addCondition(Form::FILLED)
-				->addRule(Form::NUMERIC, 'Price must be a number.');
+				->addRule(Form::RANGE, 'Price must be a positive number.', [0, NULL]);
 
 		$form->addText('priceTo', 'Price max:')
 			->addCondition(Form::FILLED)
-				->addRule(Form::NUMERIC, 'Price must be a number.');
+				->addRule(Form::RANGE, 'Price must be a positive number.', [0, NULL]);
 
 		$form->addSubmit('search', 'Search');
 
@@ -70,5 +89,44 @@ class ProductListPresenter extends BasePresenter
 		} else {
 			$this->template->foundProducts = $this->productFacade->getByRestrictions($restrictor);
 		}
+	}
+
+
+	public function createComponentCreateProduct()
+	{
+		$form = new Form;
+
+		$form->addHidden('department', $this->params['departmentId']);
+
+		$form->addText('name', 'Product name:')
+			->setRequired('Please fill the name.');
+
+		$form->addText('price', 'Price:')
+			->setRequired('Please fill the price.')
+			->addRule(Form::RANGE, 'Fill price as positive number.', [0, NULL]);
+
+			$form->addSubmit('create', 'Create');
+
+		$form->onSuccess[] = $this->createProduct;
+		return $form;
+	}
+
+
+	public function createProduct(Form $form)
+	{
+		$values = $form->getValues();
+
+		try {
+			$product = $this->productFacade->create($values->name, $values->price, $values->department, FALSE);
+		} catch (IntegrityException $e) {
+			foreach ($e->getAllMessages() as $message) {
+				$form->addError($message);
+			}
+			return;
+		}
+
+		$departmentName = ucfirst($this->department->name);
+		$this->flashMessage("Created $departmentName $product->name.");
+		$this->redirect('default', ['departmentId' => $values->department]);
 	}
 }

@@ -77,7 +77,7 @@ class Mapper implements \LazyDataMapper\IMapper
 		$data = $holder->getData();
 		$columns = implode(', ', array_keys($data));
 		$values = implode(', ', array_fill(0, count($data), '?'));
-		$this->db->queryArgs("INSERT INTO product ($columns) VALUES($values)", $data);
+		$this->db->queryArgs("INSERT INTO product ($columns) VALUES($values)", array_values($data));
 		return (int) $this->db->getInsertId();
 	}
 

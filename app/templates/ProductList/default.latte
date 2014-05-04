@@ -14,6 +14,8 @@
 
 {elseif isset($currentDepartment)}
 	<h2>{$currentDepartment->name|firstUpper} list</h2>
+
+	<p><a n:href="new departmentId => $currentDepartment->id">create new product</a></p>
 	{var $products = $currentDepartment->products}
 {/if}
 
