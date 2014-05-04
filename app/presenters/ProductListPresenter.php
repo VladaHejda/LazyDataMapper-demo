@@ -66,7 +66,7 @@ class ProductListPresenter extends BasePresenter
 		}
 
 		if (!$restrictor->hasRestrictions()) {
-			$form->addError('K vyhledání produktu musíte zadat alespoň nějaká kritéria.');
+			$form->addError('To search product you must input at least some criteria.');
 		} else {
 			$this->template->foundProducts = $this->productFacade->getByRestrictions($restrictor);
 		}
