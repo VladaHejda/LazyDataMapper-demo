@@ -27,7 +27,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function getById($id, Suggestor $suggestor, DataHolder $holder = NULL)
 	{
 		$params = $suggestor->getSuggestions();
-		$columns = implode(',', $params);
+		$columns = implode(', ', $params);
 		$data = $this->db->fetch("SELECT $columns FROM product WHERE id = ?", $id);
 		$holder->setData(iterator_to_array($data));
 		return $holder;
@@ -48,8 +48,8 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function getByIdsRange(array $ids, Suggestor $suggestor, DataHolder $holder = NULL)
 	{
 		$params = $suggestor->getSuggestions();
-		$columns = implode(',', $params);
-		$in = implode(',', array_fill(0, count($ids), '?'));
+		$columns = implode(', ', $params);
+		$in = implode(', ', array_fill(0, count($ids), '?'));
 		$result = $this->db->queryArgs("SELECT id, $columns FROM product WHERE id IN ($in)", $ids)->fetchAll();
 		$data = [];
 		foreach ($result as &$subdata) {
@@ -67,7 +67,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function save($id, DataHolder $holder)
 	{
 		$changes = $holder->getData();
-		$columns = implode('=?, ', array_keys($changes)) . '=?';
+		$columns = implode(' = ?, ', array_keys($changes)) . ' = ?';
 		$this->db->queryArgs("UPDATE product SET $columns WHERE id = ?", array_merge($changes, [$id]));
 	}
 
@@ -75,8 +75,8 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function create(DataHolder $holder)
 	{
 		$data = $holder->getData();
-		$columns = implode(',', array_keys($data));
-		$values = implode(',', array_fill(0, count($data), '?'));
+		$columns = implode(', ', array_keys($data));
+		$values = implode(', ', array_fill(0, count($data), '?'));
 		$this->db->queryArgs("INSERT INTO product ($columns) VALUES($values)", $data);
 		return (int) $this->db->getInsertId();
 	}
@@ -91,7 +91,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function removeByIdsRange(array $ids)
 	{
 		$count = count($ids);
-		$in = implode(',', array_fill(0, $count, '?'));
+		$in = implode(', ', array_fill(0, $count, '?'));
 		$this->db->queryArgs("DELETE FROM product WHERE id IN ($in) LIMIT $count", $ids);
 	}
 }

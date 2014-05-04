@@ -26,6 +26,8 @@ class ProductListPresenter extends BasePresenter
 		if ($departmentId !== NULL) {
 			$this->template->currentDepartment = $this->departmentFacade->getById($departmentId);
 		}
+
+		$this['searchProduct']->action = '?';
 	}
 
 

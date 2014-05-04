@@ -26,15 +26,31 @@ class Mapper implements \LazyDataMapper\IMapper
 
 	public function getById($id, Suggestor $suggestor, DataHolder $holder = NULL)
 	{
+		$join = '';
+
 		$params = $suggestor->getSuggestions();
-		$columns = implode(',', $params);
+		$columns = 'd.' . implode(', d.', $params);
 
 		if ($suggestor->products) {
-
+			$params = $suggestor->products->getSuggestions();
+			$columns .= ', p.id product_id, p.' . implode(', p.', $params);
+			$columns = str_replace('p.name', 'p.name product_name', $columns);
+			$join = "LEFT JOIN product p ON (d.id = p.department_id)";
 		}
 
-		$data = $this->db->fetch("SELECT $columns FROM department WHERE id = ?", $id);
-		$holder->setData(iterator_to_array($data));
+		$data = $this->db->fetchAll("SELECT $columns FROM department d $join WHERE d.id = ?", $id);
+		foreach ($data as &$subdata) {
+			$subdata = iterator_to_array($subdata);
+			if (!$holder->isDataLoaded()) {
+				$holder->setData($subdata);
+			}
+			if (isset($subdata['product_name'])) {
+				$subdata['name'] = $subdata['product_name'];
+			}
+		}
+		if ($holder->products) {
+			$holder->products->setIdSource('product_id')->setData($data);
+		}
 		return $holder;
 	}
 
