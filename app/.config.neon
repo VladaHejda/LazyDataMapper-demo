@@ -42,5 +42,8 @@ services:
 	- LazyDataMapper\SuggestorCache
 	- LazyDataMapper\Accessor
 
+	# Department model
+	- Department\Facade
+
 	# Product model
 	- Product\Facade

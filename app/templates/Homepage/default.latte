@@ -1,36 +1,9 @@
 {block content}
 
-<h1>LazyDataMapperDemo</h1>
+<p>Welcome to DEMO shop built with LazyDataMapper</p>
 
-<p>
-	Product name: {$product->name} (price: {$product->price} €)
-</p>
-
-<table>
-	<thead>
-		<tr>
-			<th>&nbsp;</th><th>Name</th><th>Price</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr n:foreach="$products as $i => $product">
-			<td>{$i+1}.</td><td>{$product->name}</td><td>{$product->price} €</td>
-		</tr>
-	</tbody>
-</table>
-
-<h2>Product 13</h2>
-{control modifyProduct13}
-
-<h2>Create new TV</h2>
-{control createTV}
-
-<h2>TVs most expensive for 250 €:</h2>
-{form removeTV}
-<ul n:if="count($tvs)" n:inner-foreach="$tvs as $tv">
-	<li>
-		<label>{$tv->name} (price {$tv->price}) <input type="checkbox" name="rm[]" value="{$tv->id}"></label>
-	</li>
+<ul>
+	<li><a n:href="productList:">Product list</a></li>
 </ul>
-{input remove onclick => "return confirm('Really delete?');"}
-{/form}
+
+

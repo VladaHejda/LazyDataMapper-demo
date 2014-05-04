@@ -1,0 +1,38 @@
+{block content}
+
+<h2>Departments</h2>
+
+<ul n:foreach="$departments as $department">
+	<li><a n:href="this departmentId => $department->id"{ifCurrent this departmentId => $department->id} class="current"{/ifCurrent}>{$department->name|upper}</a></li>
+</ul>
+
+{control searchProduct}
+
+{if isset($foundProducts)}
+	<h2>Found products</h2>
+	{var $products = $foundProducts}
+
+{elseif isset($currentDepartment)}
+	<h2>{$currentDepartment->name|firstUpper} list</h2>
+	{var $products = $currentDepartment->products}
+{/if}
+
+{if isset($products) && !count($products)}
+<p>Zadaným kritériím neodpovídá žádný produkt.</p>
+
+{elseif isset($products)}
+<table>
+	<thead>
+		<tr>
+			<th>&nbsp;</th><th>Name</th><th>Price</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr n:foreach="$products as $i => $product">
+			<td>{$i+1}.</td><td><a n:href="product: productId => $product->id">{$product->name}</a></td><td>{$product->price} €</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>Total price of products is {$products->price} €</p>
+{/if}

@@ -9,11 +9,14 @@
 
 	<link rel="stylesheet" href="{$basePath}/css/screen.css">
 	<link rel="shortcut icon" href="{$basePath}/favicon.ico">
+	<script src="{$basePath}/js/netteForms.js"></script>
 	{block head}{/block}
 </head>
 
 <body>
 	<script> document.documentElement.className+=' js' </script>
+
+	<h1>LazyDataMapper DEMO</h1>
 
 	<div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
 

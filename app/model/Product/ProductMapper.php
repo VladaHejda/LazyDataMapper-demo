@@ -13,6 +13,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	private $pdo;
 
 
+	// todo modify to Nette\Database
 	public function __construct(\PDO $pdo)
 	{
 		$this->pdo = $pdo;
@@ -33,8 +34,7 @@ class Mapper implements \LazyDataMapper\IMapper
 		$columns = SuggestorHelpers::wrapColumns($params);
 		$statement = $this->pdo->prepare("SELECT $columns FROM product WHERE id = ?");
 		$statement->execute([$id]);
-		$data = array_intersect_key($statement->fetch(), array_flip($params));
-		$holder->setData($data);
+		$holder->setData($statement->fetch());
 		return $holder;
 	}
 
@@ -42,7 +42,7 @@ class Mapper implements \LazyDataMapper\IMapper
 	public function getIdsByRestrictions(\LazyDataMapper\IRestrictor $restrictor, $limit = NULL)
 	{
 		list($conditions, $parameters) = $restrictor->getRestrictions();
-		$statement = $this->pdo->prepare("SELECT id FROM product WHERE $conditions");
+		$statement = $this->pdo->prepare("SELECT id FROM product p WHERE $conditions");
 		$statement->execute($parameters);
 		$ids = [];
 		while ($id = $statement->fetchColumn()) {
@@ -59,12 +59,15 @@ class Mapper implements \LazyDataMapper\IMapper
 		$in = implode(',', array_fill(0, count($ids), '?'));
 		$statement = $this->pdo->prepare("SELECT id, $columns FROM product WHERE id IN ($in)");
 		$statement->execute($ids);
-		$params = array_flip($params);
 		while ($row = $statement->fetch()) {
-			$data = array_intersect_key($row, $params);
-			$holder->setData([$row['id'] => $data]);
+			$holder->setData([$row['id'] => $row]);
 		}
 		return $holder;
+	}
+
+
+	public function getAllIds($maxCount = NULL)
+	{
 	}
 
 
